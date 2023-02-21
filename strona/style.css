@@ -1,0 +1,130 @@
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+@media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+}
+.topbar {
+    width: 100%;
+    display: inline-block; 
+    background-color: rgba(37, 37, 37, 0.205);
+    padding: 3px;
+}
+
+.topbar span  { 
+    font-size:30px;
+    cursor:pointer; 
+    float:left;
+}
+.topbar div   {
+    margin: 10px;
+    float: right;
+}
+.ChartsTop  {
+    float: left;
+    padding: 20px;
+    width: 100%;
+    height: 50%;
+}
+.ChartsBottom {
+    float: left;
+    padding: 20px;
+    width: 100%;
+}
+.liniowy{
+    box-shadow: 0 0 5px 5px #4d4b4b56, 0 0 0 0 #66ccff;
+    float: left;
+    margin: 1%;
+    width: 45%;
+    padding-left: 5px;  
+    padding-bottom: 5px;
+}   
+/*.main{
+    background-color:#818181;
+}*/
+.SmallCharts{
+    columns: 2;
+    display:grid;
+    column-gap: 3%;
+    row-gap: 3%;
+    float: left;
+    width: 50%;
+    margin: 10px;
+    margin-left: 10px;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    height: 405px;
+}
+.PieSmall{
+    box-shadow: 0 0 5px 5px #4d4b4b56, 0 0 0 0 #66ccff;
+    float: left ;
+    min-width: 300px;
+    width: 100%;
+    height: 100%;
+
+}
+#tetowanie{
+    margin: 1%;
+    width: 45%;
+    height: 400px;
+    padding-left: 5px;
+    padding-bottom: 5px;
+    margin: 1%;
+}
+#tetdat, tr{
+    height: 15%;
+    padding: 3%;
+}
+
+#slupkowy{
+    box-shadow: 0 0 5px 5px #4d4b4b56, 0 0 0 0 #66ccff;
+    float: left;
+    width: 45%;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin: 10px;
+}
+#WierszSlupkowy{
+    float: left;
+    width: 40%;
+    padding-left: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-right: 5px;
+    margin: 10px;
+    box-shadow: 0 0 5px 5px #4d4b4b56, 0 0 0 0 #66ccff;
+}

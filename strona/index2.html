@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Interactive Dashboard for Interoperability</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body{font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif}
+        </style>
+        <link rel="stylesheet" href="style.css">
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>    </head>
+    <body>
+        <div id="topbar" class="topbar">
+            <span onclick="openNav()">&#9776;</span>
+            <div>
+                <b>INTERACTIVE DASHBOARD FOR INTEROPERABILITY</b>
+            </div>
+        </div>
+        <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <a href="#">HP</a>
+            <a href="#">KPI1</a>
+            <a href="#">KPI2</a>
+            <a href="#">KPIn</a>
+          </div>
+         <div id="main" class="main">
+            <div id="ChartsTop" class="ChartsTop">
+                <div id="liniowy" class="liniowy"></div>
+                <table id="tetowanie">
+                    <tr>
+                        <td id="tetdat">
+                            <div id="PieChart" class="PieSmall">
+                            </div>
+                        </td>                
+                        <td id="tetdat">
+                            <div id="SemiDonut" class="PieSmall">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id="tetdat">
+                            <div id="SemiDonut2" class="PieSmall">
+                            </div>
+                        </td>
+                        <td id="tetdat">
+                            <div id="PieChart2" class="PieSmall">
+                            </div>
+                        </td>
+                    </tr>
+
+
+
+                </table>
+            
+            </div>
+            <div id="ChartsBottom" class="ChartsBottom">
+                <div id="slupkowy" class="slupkowy"></div>
+                <div id="WierszSlupkowy" class="WierszSlupkowy"></div>
+            </div>
+        </div> 
+          
+    </body>
+    <script src="script.js"></script>
+    <script>
+        function openNav() 
+        {    
+            document.getElementById("mySidenav").style.width = "250px";
+        }
+        function closeNav() 
+        {
+            document.getElementById("mySidenav").style.width = "0";
+        } 
+    </script>
+</html>

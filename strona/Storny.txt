@@ -1,0 +1,5 @@
+ https://apexcharts.com/javascript-chart-demos/pie-charts/simple-pie-chart/
+https://apexcharts.com/docs/options/plotoptions/pie/#labels
+https://apexcharts.com/docs/chart-types/pie-donut/
+https://codepen.io/apexcharts/pen/PQpaLb
+https://dev.to/dawnind/3-ways-to-display-two-divs-side-by-side-3d8b
