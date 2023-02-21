@@ -1,0 +1,81 @@
+body {
+    margin: 0;
+    font-family: "Lucida Console", "Courier New", monospace;
+}
+
+#leftNav {
+    background-color: #1e2d4a;
+    width: 200px;
+    height: 100%;
+    position: fixed;
+    text-align: center;
+    }
+
+#rightSite {
+    margin-left: 200px;
+ }
+
+
+#wordbarContainer {
+    height: 40px;
+    background-color:rgba(0,0,0,0.1);
+}
+#wordbar {
+    display: flex;
+    justify-content: center;
+    height: 95%;
+    width: 100%;
+    background-color: white;
+
+}
+
+
+.worldContainer {
+    margin: 20px;
+    height: 300px;
+    width: 300px;
+    background-color: white;
+}
+.main {
+    display: flex;
+}
+#DataContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 2px 15px;
+    width: 100%;
+    background-color: rgba(0,0,0,0.1);
+
+    overflow-y: scroll;
+    top: 0;
+    bottom: 0;
+}
+.Data {
+    display: block;
+    background-color: white;
+    width: 99%;
+    margin-left: 2px;
+}
+/* wypelnienie wartosci*/
+
+#SimpleSummary {
+    height: 10%;
+}
+#chartOne {
+    height: 45%;
+}
+#chartTwo {
+    height: 45%;
+}
+#DataCountry {
+    text-align: center;
+    height: 5%;
+}
+.frame {
+    background-color: white;
+    height: 100%;
+}
+.container {
+    display: flex;
+
+}
