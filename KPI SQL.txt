@@ -189,3 +189,30 @@ on
 	fa.id = s1.focus_area_id
 
 Podaje ilość objectiv dla każdej focus area z podziałem na wyniki testów i wyliczonym stosunkiem porażek do suukcesów
+
+KPI 10
+
+select
+	t.exercise_cycle, 
+	was_validating,
+	t.io_shortfall_ind standard_shortdall,
+	count(t.id)
+from 
+	testcases t 
+join
+	(select 
+		testcase_id,
+		sum(case when task_id = 9 then 1 else 0 end) > 0 was_validating
+	from
+		capability_tasks ct 
+	join
+		test_participants tp 
+	on
+		ct.capability_id = tp.capability_id
+	group by testcase_id) s1
+on s1.testcase_id = t.id
+group by t.exercise_cycle, was_validating, t.io_shortfall_ind
+order by 1, 2, 3
+
+Pokazuje ile problemów ze standardami zostało wykryte przez te testy w których przynajmniej jedno capability miało funkcję walidacji standardu (nie jestem pewien
+czy to działa tak jak my zakładaliśmy, tzn. czy to standard validation faktycznie sprawdza standard)
