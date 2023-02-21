@@ -216,3 +216,94 @@ order by 1, 2, 3
 
 Pokazuje ile problemów ze standardami zostało wykryte przez te testy w których przynajmniej jedno capability miało funkcję walidacji standardu (nie jestem pewien
 czy to działa tak jak my zakładaliśmy, tzn. czy to standard validation faktycznie sprawdza standard)
+
+KPI 11
+
+//----------BEGIN-------------Test only, not implement------------BEGIN--------------//
+
+select	
+	s1.name Country_name,
+	count(s1.id)::float/6, as Straight_average
+	count(case when s2.name = 'Air' then 1 end) as Air_avg_diff,
+	count(case when s2.name = 'Land' then 1 end) as Land_avg_diff,
+	count(case when s2.name = 'Maritime' then 1 end) as Maritime_avg_diff,
+	count(case when s2.name = 'Cyberspace' then 1 end) as Cyberspace_avg_diff,
+	count(case when s2.name = 'Space' then 1 end) as Space_avg_diff,
+	count(case when s2.name = 'Other Support Services' then 1 end) as Other_Support_Services_avg_diff
+from 
+	(select 
+		n."name",
+		c.id 
+	from
+		capabilities c 
+	join
+		nations n 
+	on
+		c.nation_id = n.id) s1
+join 
+	(select
+		cod.capability_id, 
+		od."name"
+	from 
+		operational_domains od 
+	join
+		capability_operational_domains cod 
+	on
+		od.id = cod.operational_domain_id) s2
+on
+	s1.id = s2.capability_id
+group by
+	s1.name
+order by
+	substring(s1.name, 7)::int, 2
+
+//----------END-------------Test only, not implement------------END--------------//
+	
+select 
+	country_name,
+	(sqrt(power(Air_avg_diff, 2) + power(Land_avg_diff, 2) + power(Maritime_avg_diff, 2) + power(Cyberspace_avg_diff, 2) + power(Space_avg_diff, 2) + power(Other_Support_Services_avg_diff, 2)))/straight_average as Specialization_indicator,
+	Air_avg_diff,
+	Land_avg_diff,
+	Maritime_avg_diff,
+	Cyberspace_avg_diff,
+	Space_avg_diff,
+	Other_Support_Services_avg_diff
+from
+	(select	
+		s1.name Country_name,
+		count(s1.id)::float/6 as Straight_average,
+		count(case when s2.name = 'Air' then 1 end) - count(s1.id)::float/6 as Air_avg_diff,
+		count(case when s2.name = 'Land' then 1 end) - count(s1.id)::float/6 as Land_avg_diff,
+		count(case when s2.name = 'Maritime' then 1 end) - count(s1.id)::float/6 as Maritime_avg_diff,
+		count(case when s2.name = 'Cyberspace' then 1 end) - count(s1.id)::float/6 as Cyberspace_avg_diff,
+		count(case when s2.name = 'Space' then 1 end) - count(s1.id)::float/6 as Space_avg_diff,
+		count(case when s2.name = 'Other Support Services' then 1 end) - count(s1.id)::float/6 as Other_Support_Services_avg_diff
+	from 
+		(select 
+			n."name",
+			c.id 
+		from
+			capabilities c 
+		join
+			nations n 
+		on
+			c.nation_id = n.id) s1
+	join 
+		(select
+			cod.capability_id, 
+			od."name"
+		from 
+			operational_domains od 
+		join
+			capability_operational_domains cod 
+		on
+			od.id = cod.operational_domain_id) s2
+	on
+		s1.id = s2.capability_id
+	group by
+		s1.name
+	order by
+		substring(s1.name, 7)::int, 2) s1
+
+Wylicza stosunek średniokwadratowego pierwiastka błędu do prostej średniej (współczynnik specjalizacji) Im bliżej zera typ bardziej zrównoważony rozkład domen krytych
+przez capabilities danego państwa (Im bliższy zera tym lepiej, daje kiepskie wyniki dla małej ilości danych) (Dołożyć jeszcze podział na lata)
