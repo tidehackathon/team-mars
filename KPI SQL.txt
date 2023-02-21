@@ -1,0 +1,191 @@
+Notatki na później:
+
+W focus area są wyszczegolnione operational domains testow. Można sprawdzić stopień pokrycia deklarowanych w capabilities przez testy
+
+
+KPI 2+3
+
+select
+	name Country_name,
+	exercise_cycle,
+	count(participant_result) as Sum_Of_All_Participations,
+	count(case when participant_result = 'Success' then 1 end) as Success,
+	count(case when participant_result = 'Limited Success' then 1 end)as Limited_success,
+	count(case when participant_result = 'Pending' then 1 end) as Pending,
+	count(case when participant_result = 'Not Tested' then 1 end) as Not_Tested,
+	count(case when participant_result = 'Interoperability Issue' then 1 end) as Interoperability_Issue 
+		from 
+			(select c.id, n.name from capabilities c right join nations n on c.nation_id = n.id ) s1 
+		left join 
+			test_participants tp on s1.id = tp.capability_id 
+		group by name, exercise_cycle
+		order by cast(substring(name from 7)as int) asc, right(exercise_cycle, 4) asc
+
+Jak wiele razy capab z każdego z państw brał udział w testach i jaki był rokzład wyników
+
+KPI 2
+select
+	name Country_name,
+	exercise_cycle,
+	count(participant_result) as Sum_Of_All_Participations
+		from 
+			(select c.id, n.name from capabilities c right join nations n on c.nation_id = n.id ) s1 
+		left join 
+			test_participants tp on s1.id = tp.capability_id 
+		group by name, exercise_cycle
+		order by cast(substring(name from 7)as int) asc, right(exercise_cycle, 2
+
+Jak wiele razy capab z każdego z państw brał udział w testach
+
+KPI 3
+
+select
+	exercise_cycle,
+	sum(Success_To_All_Ratio) / count(name) as Average_success_rate
+		from 
+			(select 
+				c."name",
+				exercise_cycle,
+				cast(count(case when participant_result = 'Success' or participant_result = 'Limited Success' then 1 end) as float)/cast(count(participant_result) as float) as Success_To_All_Ratio
+					from 
+						capabilities c 
+					join 
+						(select capability_id, participant_result, exercise_cycle from test_participants tp where participant_result = 'Success' or participant_result = 'Limited Success' or participant_result = 'Interoperability Issue') as s1 
+					on 
+						c.id = s1.capability_id
+					group by c."name", exercise_cycle) as s1
+	group by exercise_cycle
+	order by right(exercise_cycle, 4) asc
+
+Średni succes rate capabilities w danym roku
+
+KPI 6
+
+select
+	exercise_cycle,
+	dom_count,
+	sum(success_to_all_ratio) / count(s1.capability_id) as Averafe_succes_rate_in_domain
+		from
+		(select 
+			capability_id,
+			count(operational_domain_id) as dom_count
+				from 
+					capability_operational_domains cod 
+				group by
+					capability_id ) s1
+		join 
+		(select 
+			exercise_cycle,
+			capability_id,
+			cast(count(case when participant_result = 'Success' or participant_result = 'Limited Success' then 1 end) as float)/cast(count(participant_result) as float) as Success_To_All_Ratio
+				from 
+					capabilities c 
+				join 
+					(select capability_id, participant_result, exercise_cycle from test_participants tp where participant_result = 'Success' or participant_result = 'Limited Success' or participant_result = 'Interoperability Issue') as s1 
+				on 
+					c.id = s1.capability_id
+				group by exercise_cycle, capability_id) s2
+		on
+			s1.capability_id = s2.capability_id
+	group by exercise_cycle, dom_count 
+	order by right(exercise_cycle , 4) asc, dom_count asc
+
+Średni success rate dla capabilities na danej ilości domen
+
+KPI 7
+
+select 	
+	s2.perm,
+	tp.exercise_cycle,
+	count(s2.capability_id)
+from
+	test_participants tp 
+	join
+		(select 
+			cod.capability_id, 
+			string_agg(cod.operational_domain_id::varchar(100), '') as perm
+			from
+				capability_operational_domains cod 
+			group by capability_id
+			order by capability_id  asc) as s2
+	on
+		tp.capability_id = s2.capability_id
+group by
+	s2.perm, tp.exercise_cycle 
+order by
+	 perm asc, right(exercise_cycle, 4) asc
+
+Ilość capab biorących udział w testach w danym roku z uwzględnieniem w jakich domenach one działają
+
+KPI 8 var 1
+
+select
+	exercise_cycle,
+	io_shortfall_ind,
+	sum(s2.cou) / count(s2.cou) as Average_domain_complexity
+from
+	(select 
+		t.exercise_cycle,
+		t.id,
+		capability_id,
+		t.io_shortfall_ind 
+	from 
+		testcases t 
+	join
+		test_participants tp 
+	on
+		t.id = tp.testcase_id 
+	order by t.id asc) s1
+join
+	(select 
+		capability_id,
+		count(operational_domain_id) as cou
+	from capability_operational_domains cod 
+	group by capability_id 
+	order by 1 asc) s2
+on
+	s1.capability_id = s2.capability_id
+group by exercise_cycle, io_shortfall_ind
+order by right(exercise_cycle, 4)
+
+Średnia interoperacyjność domenowa capab biorących udział w testach zakończonych znalezieniem błędów w standardach w porównaniu z tymi które nie znalazły
+
+KPI 9
+
+select
+	fa."name", objective_count, success, limited_success, pending, not_tested, interoperability_issue, fail_to_success_ratio
+from
+	focus_areas fa 
+join
+	(select
+		focus_area_id,
+		count(o.id) objective_count,
+		count(case when s1.overall_result = 'Success' then 1 end) as Success,
+		count(case when s1.overall_result = 'Limited Success' then 1 end) as Limited_success,
+		count(case when s1.overall_result = 'Pending' then 1 end) as Pending,
+		count(case when s1.overall_result = 'Not Tested' then 1 end) as Not_Tested,
+		count(case when s1.overall_result = 'Interoperability Issue' then 1 end) as Interoperability_Issue, 
+		count(case when s1.overall_result = 'Interoperability Issue' then 1 end)::float / (count(case when s1.overall_result = 'Success' then 1 end) + count(case when s1.overall_result = 'Limited Success' then 1 end)) Fail_To_Success_Ratio
+	from
+		objectives o 
+	join
+		(select 
+			t.id,
+			to2.objective_id,
+			t.overall_result 
+		from 
+			testcases t 
+		join
+			test_objectives to2 
+		on
+			t.id = to2.testcase_id ) s1
+	on 
+		o.id = s1.objective_id
+	group by 
+		focus_area_id
+	order by 
+		focus_area_id  asc) s1
+on
+	fa.id = s1.focus_area_id
+
+Podaje ilość objectiv dla każdej focus area z podziałem na wyniki testów i wyliczonym stosunkiem porażek do suukcesów
