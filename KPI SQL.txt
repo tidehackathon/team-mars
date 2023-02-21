@@ -321,3 +321,34 @@ from
 
 Wylicza stosunek średniokwadratowego pierwiastka błędu do prostej średniej (współczynnik specjalizacji) Im bliżej zera typ bardziej zrównoważony rozkład domen krytych
 przez capabilities danego państwa (Im bliższy zera tym lepiej, daje kiepskie wyniki dla małej ilości danych)
+
+KPI 12
+
+select 
+	exercise_cycle,
+	s1.number_of_warfare_levels,
+	count(case when participant_result = 'Interoperability Issue' then 1 end)::float / count(tp.capability_id) as Issue_to_all_test_ratio
+from 
+	(select 
+		cw.capability_id,
+		count(wl.name) number_of_warfare_levels
+	from
+		warfare_levels wl 
+	join
+		capability_warfarelevels cw 
+	on
+		cw.warfarelevel_id = wl.id
+	group by 
+		cw.capability_id) s1
+join 
+	test_participants tp 
+on
+	s1.capability_id = tp.capability_id
+where 
+	tp.participant_result != 'Pending' and tp.participant_result != 'Not Tested'
+group by 
+	exercise_cycle, s1.number_of_warfare_levels
+order by 
+	right(exercise_cycle, 4), 2
+
+Wylicza stosunek błędnych testów do wszystkich dla capabilities w zależności od obsługiwanych poziomów wojny
