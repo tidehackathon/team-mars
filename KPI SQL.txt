@@ -1,3 +1,5 @@
+File will be later translated to english and all queries properly explained, it's temporary notepad for now
+
 Notatki na później:
 
 W focus area są wyszczegolnione operational domains testow. Można sprawdzić stopień pokrycia deklarowanych w capabilities przez testy
