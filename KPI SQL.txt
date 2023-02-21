@@ -155,19 +155,17 @@ order by right(exercise_cycle, 4)
 KPI 9
 
 select
-	fa."name", objective_count, success, limited_success, pending, not_tested, interoperability_issue, fail_to_success_ratio
+	fa."name", success, limited_success, pending, not_tested, interoperability_issue
 from
 	focus_areas fa 
 join
 	(select
 		focus_area_id,
-		count(o.id) objective_count,
 		count(case when s1.overall_result = 'Success' then 1 end) as Success,
 		count(case when s1.overall_result = 'Limited Success' then 1 end) as Limited_success,
 		count(case when s1.overall_result = 'Pending' then 1 end) as Pending,
 		count(case when s1.overall_result = 'Not Tested' then 1 end) as Not_Tested,
-		count(case when s1.overall_result = 'Interoperability Issue' then 1 end) as Interoperability_Issue, 
-		count(case when s1.overall_result = 'Interoperability Issue' then 1 end)::float / (count(case when s1.overall_result = 'Success' then 1 end) + count(case when s1.overall_result = 'Limited Success' then 1 end)) Fail_To_Success_Ratio
+		count(case when s1.overall_result = 'Interoperability Issue' then 1 end) as Interoperability_Issue
 	from
 		objectives o 
 	join
