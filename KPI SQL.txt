@@ -41,7 +41,7 @@ KPI 3
 
 select
 	exercise_cycle,
-	round(cast((sum(Success_To_All_Ratio) / count(name))as numeric) *100, 5) as Average_success_rate
+	round(((sum(Success_To_All_Ratio) / count(name))::numeric) *100, 5) as Average_success_rate
 		from 
 			(select 
 				c."name",
