@@ -155,11 +155,12 @@ order by right(exercise_cycle, 4)
 KPI 9
 
 select
-	fa."name", success, limited_success, pending, not_tested, interoperability_issue
+	exercise_cycle, fa."name", success, limited_success, pending, not_tested, interoperability_issue
 from
 	focus_areas fa 
 join
 	(select
+		s1.exercise_cycle,
 		focus_area_id,
 		count(case when s1.overall_result = 'Success' then 1 end) as Success,
 		count(case when s1.overall_result = 'Limited Success' then 1 end) as Limited_success,
@@ -169,7 +170,8 @@ join
 	from
 		objectives o 
 	join
-		(select 
+		(select
+			t.exercise_cycle,
 			t.id,
 			to2.objective_id,
 			t.overall_result 
@@ -182,11 +184,13 @@ join
 	on 
 		o.id = s1.objective_id
 	group by 
-		focus_area_id
+		s1.exercise_cycle, focus_area_id
 	order by 
 		focus_area_id  asc) s1
 on
 	fa.id = s1.focus_area_id
+order by 
+	right(exercise_cycle, 4), 2
 
 Podaje ilość objectiv dla każdej focus area z podziałem na wyniki testów i wyliczonym stosunkiem porażek do suukcesów
 
