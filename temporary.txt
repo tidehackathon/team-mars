@@ -36,44 +36,6 @@ from
 				from 
 					testcases t 
 				where 
-					overall_result !=select 
-	n,
-	test_fail_propability_2021,
-	test_fail_propability_2022
-from 
-	(select 
-		s1.name as n,
-		(s1.cwix_2021_bad::float / nullif(s2.cwix_2021_all,0)) as test_fail_propability_2021,
-		(s1.cwix_2022_bad::float / nullif(s2.cwix_2022_all,0)) as test_fail_propability_2022
-	from
-		(select 
-			s1.name,
-			count(case when s1.exercise_cycle = 'CWIX 2021' then 1 end) as CWIX_2021_bad,
-			count(case when s1.exercise_cycle = 'CWIX 2022' then 1 end) as CWIX_2022_bad
-		from 
-			(select 
-				s2.id,
-				s1.name,
-				s2.exercise_cycle,
-				s2.overall_result
-			from 
-				(select 
-					s.name,
-					ts.testcase_id
-				from 
-					standards s 
-				join
-					testcase_standards ts 
-				on
-					s.id = ts.standard_id) s1
-			join 
-				(select 
-					t.id,
-					exercise_cycle,
-					t.overall_result 
-				from 
-					testcases t 
-				where 
 					overall_result != 'Success' and not io_shortfall_ind) s2
 			on
 				s1.testcase_id = s2.id) s1
