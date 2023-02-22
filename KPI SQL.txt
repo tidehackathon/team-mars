@@ -5,7 +5,7 @@ Notatki na później:
 W focus area są wyszczegolnione operational domains testow. Można sprawdzić stopień pokrycia deklarowanych w capabilities przez testy
 
 
-KPI 2+3
+KPI 2+3 (sprawdź, daje wartości z nullem których nie powinno być)
 
 select
 	name Country_name,
@@ -356,3 +356,41 @@ order by
 	right(exercise_cycle, 4), 2
 
 Wylicza stosunek błędnych testów do wszystkich dla capabilities w zależności od obsługiwanych poziomów wojny
+
+KPI 13
+
+select
+	s1.exercise_cycle,
+	sum(s1.failure_rate) / count(s1.failure_rate) as Average_failure_rate_of_participant_in_test
+from
+	(select
+		s1.exercise_cycle,
+		t.title, 
+		s1.testcase_id,
+		s1.Success,
+		s1.Interoperability_issue,
+		s1.Sum_all,
+		interoperability_issue::float / s1.sum_all as failure_rate
+	from
+		(select
+			tp.exercise_cycle,
+			tp.testcase_id,
+			count(case when tp.participant_result = 'Success' or tp.participant_result = 'Limited Success' then 1 end) as Success,
+			count(case when tp.participant_result = 'Interoperability Issue' then 1 end) as Interoperability_issue,
+			count(tp.participant_result) as Sum_all
+		from 
+			test_participants tp
+		where 
+			tp.participant_result != 'Not Tested' and tp.participant_result != 'Pending'
+		group by
+			tp.exercise_cycle, tp.testcase_id
+		order by
+			right(exercise_cycle, 4), 2) s1
+	join 
+		testcases t 
+	on
+		s1.testcase_id = t.id) s1
+group by
+	s1.exercise_cycle
+	
+Wylicza średnią szansę każdego participanta testu na negatywny wynik
