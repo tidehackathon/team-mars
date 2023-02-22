@@ -468,3 +468,87 @@ from
 		s1.name) s1
 
 Wylicza issue ratio dla każdego z testowanych standardów, manualnie zmień rok w zapytaniu.
+
+KPI 15
+
+select 
+	s3.nation_name,
+	s3.name,
+	s4.exercise_cycle,
+	count(case when s4.name = 'Test Planning' then 1 end) as Test_planning,
+	count(case when s4.name = 'Lack of time' then 1 end) as Lack_of_time,
+	count(case when s4.name = 'FMN - irrelevant imported IOCore-TC' then 1 end) as FMN,
+	count(case when s4.name = 'Not Executable' then 1 end) as Not_executable,
+	count(case when s4.name = 'Architecture' then 1 end) as Architecture,
+	count(case when s4.name = 'Withdrawn CC' then 1 end) as Withdrawn_CC,
+	count(case when s4.name = 'Configuration' then 1 end) as Config,
+	count(case when s4.name = 'Training' then 1 end) as Training,
+	count(case when s4.name = 'Standards' then 1 end) as Standards,
+	count(case when s4.name = 'Permissions' then 1 end) as Permisiions,
+	count(case when s4.name = 'Software' then 1 end) as Software,
+	count(case when s4.name = 'Duplicated TC' then 1 end) as Duplicated_TC
+from
+	(select 
+		s1.nation_name,
+		s1.cap_name,
+		s2.name,
+		s1.id
+	from 
+		(select 
+			n."name" as nation_name,
+			c."name" as cap_name,
+			c.id
+		from 
+			nations n 
+		join
+			capabilities c 
+		on
+			n.id = c.nation_id) s1
+	join
+		(select 
+			t."name",
+			ct.capability_id 
+		from 
+			tasks t 
+		join
+			capability_tasks ct 
+		on
+			ct.task_id = t.id) s2	
+	on
+		s1.id = s2.capability_id) s3
+join 
+	(select 
+		tp.capability_id,
+		s1.exercise_cycle,
+		s1.name
+	from 
+		test_participants tp 
+	join
+		(select 
+			t.id,
+			t.exercise_cycle,
+			s1.name
+		from 
+			testcases t 
+		join
+			(select 
+				ic."name",
+				tic.testcase_id 
+			from 
+				testcase_issue_categories tic 
+			join
+				issue_categories ic 
+			on
+				tic.issue_category_id = ic.id 
+			where
+				tic.issue_category_id != 12) s1
+		on
+			t.id = s1.testcase_id) s1
+	on
+		tp.testcase_id = s1.id) s4
+on 
+	s3.id = s4.capability_id
+group by 
+	1, 2, 3
+
+Wyznacza ilość i rodzaj błędów testów dla capabilities danych nacji z podziałem na taski tych capabilities
