@@ -5,11 +5,11 @@ Notatki na później:
 W focus area są wyszczegolnione operational domains testow. Można sprawdzić stopień pokrycia deklarowanych w capabilities przez testy
 
 
-KPI 2+3 (sprawdź, daje wartości z nullem których nie powinno być)
+KPI 2+3 (Może w końcu działa)
 
 select
 	name Country_name,
-	exercise_cycle,
+	substring(name from 8) as temp_ind,
 	count(participant_result) as Sum_Of_All_Participations,
 	count(case when participant_result = 'Success' then 1 end) as Success,
 	count(case when participant_result = 'Limited Success' then 1 end)as Limited_success,
@@ -17,11 +17,15 @@ select
 	count(case when participant_result = 'Not Tested' then 1 end) as Not_Tested,
 	count(case when participant_result = 'Interoperability Issue' then 1 end) as Interoperability_Issue 
 		from 
-			(select c.id, n.name from capabilities c right join nations n on c.nation_id = n.id ) s1 
+			(select coalesce(c.id, 0) as id, n.name from capabilities c right join nations n on c.nation_id = n.id ) s1 
 		left join 
 			test_participants tp on s1.id = tp.capability_id 
-		group by name, exercise_cycle
-		order by cast(substring(name from 7)as int) asc, right(exercise_cycle, 4) asc
+		where 
+			exercise_cycle = 'CWIX 2021'
+		group by name
+		order by cast(substring(name from 7)as int) asc
+
+
 
 Jak wiele razy capab z każdego z państw brał udział w testach i jaki był rokzład wyników
 
@@ -394,3 +398,39 @@ group by
 	s1.exercise_cycle
 	
 Wylicza średnią szansę każdego participanta testu na negatywny wynik
+
+KPI 14
+
+select
+	s1.name,
+	s1.success,
+	s1.interoperability_issue,
+	s1.interoperability_issue::float / s1.sum_of_all as issue_ratio
+from
+	(select 
+		s1.name,
+		count(case when overall_result = 'Success' or overall_result = 'Limited Success' then 1 end) as Success,
+		count(case when overall_result = 'Interoperability Issue' then 1 end) as Interoperability_issue,
+		count(overall_result) as sum_of_all
+	from 
+		testcases t 
+	join
+		(select 
+			ts.testcase_id,
+			s."name" 
+		from 
+			standards s 
+		join
+			testcase_standards ts 
+		on
+			s.id = ts.standard_id ) s1
+	on
+		t.id = s1.testcase_id
+	where 
+		overall_result != 'Not Tested' and overall_result != 'Pending' and exercise_cycle = 'CWIX 2022'
+	group by 
+		s1.name
+	order by 
+		s1.name) s1
+
+Wylicza issue ratio dla każdego z testowanych standardów, manualnie zmień rok w zapytaniu.
