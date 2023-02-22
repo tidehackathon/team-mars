@@ -100,26 +100,60 @@ select
 
 KPI 7
 
-select 	
-	s2.perm,
-	tp.exercise_cycle,
-	count(s2.capability_id)
-from
-	test_participants tp 
+select 
+	s3.exercise_cycle,
+	s3.perm,
+	s2.con
+from 
+	(select 	
+		s2.perm,
+		tp.exercise_cycle,
+		count(s2.capability_id) as con
+	from
+		test_participants tp 
+		join
+			(select 
+				cod.capability_id, 
+				string_agg(cod.operational_domain_id::varchar(100), '') as perm
+				from
+					capability_operational_domains cod 
+				group by capability_id
+				order by capability_id  asc) as s2
+		on
+			tp.capability_id = s2.capability_id
+	group by
+		s2.perm, tp.exercise_cycle 
+	order by
+		 perm asc, right(exercise_cycle, 4) asc) s2
+right join
+	(select
+		*
+	from 
+		(select
+			t.exercise_cycle 
+		from 
+			testcases t 
+		group by
+			1
+		order by 
+			1) s1
 	join
-		(select 
-			cod.capability_id, 
-			string_agg(cod.operational_domain_id::varchar(100), '') as perm
+		(select
+			s1.perm
+		from
+			(select 
+				cod.capability_id as cid, 
+				string_agg(cod.operational_domain_id::varchar(100), '') as perm
 			from
 				capability_operational_domains cod 
 			group by capability_id
-			order by capability_id  asc) as s2
+			order by capability_id  asc) s1
+		group by 1
+		order by 1) s2
 	on
-		tp.capability_id = s2.capability_id
-group by
-	s2.perm, tp.exercise_cycle 
-order by
-	 perm asc, right(exercise_cycle, 4) asc
+		true) s3
+on
+	s2.exercise_cycle = s3.exercise_cycle and s2.perm = s3.perm
 
 Ilość capab biorących udział w testach w danym roku z uwzględnieniem w jakich domenach one działają
 
