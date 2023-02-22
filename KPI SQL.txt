@@ -149,7 +149,7 @@ right join
 			group by capability_id
 			order by capability_id  asc) s1
 		group by 1
-		order by 1) s2
+		order by s1.perm::numeric) s2
 	on
 		true) s3
 on
