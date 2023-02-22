@@ -103,7 +103,7 @@ KPI 7
 select 
 	s3.exercise_cycle,
 	s3.perm,
-	s2.con
+	coalesce(s2.con, 0) as number_of_happenings
 from 
 	(select 	
 		s2.perm,
