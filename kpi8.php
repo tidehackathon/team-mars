@@ -112,7 +112,7 @@
 }
 var options21 = {
           series: [{
-          data: [glownaWynik2021[0][2], glownaWynik2021[1][2]]
+          data: [Math.round(glownaWynik2021[0][2]*10000)/10000, Math.round(glownaWynik2021[1][2]*10000)/10000]
         }],
         title: {
             text: "Avarage domain complex. of testcase"
@@ -139,7 +139,7 @@ var options21 = {
         chart21.render();
 var options22 = {
           series: [{
-          data: [glownaWynik2022[0][2], glownaWynik2022[1][2]]
+          data: [Math.round(glownaWynik2022[0][2]*10000)/10000, Math.round(glownaWynik2022[1][2]*10000)/10000]
         }],        
         title: {
             text: "Avarage domain complex. of testcase"
