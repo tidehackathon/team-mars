@@ -27,7 +27,6 @@ function myFunction() {
         console.log("diala")
       })
       console.log(document.querySelectorAll('.CHOSEN'))
-      document.getElementById("CountryData").textContent = "Country nr:" + _id;
 
 
     }
@@ -80,4 +79,45 @@ function HeatMap()  {
 
 }
 
+function ChangeClass(){
+  console.log("start")
+  var tempArray = {
+    "Year":{0:"All",1:"2021",2:"2022"},
+    "Doctrine":{0:"All",1:"Sea",2:"Air",3:"Cyber",4:"Space",5:"Land"},
+    "Task":{0:"All",1:"Success",2:"Failure"}
+  }
+
+  var data = tempArray[document.getElementById("TypeDataMap").textContent]
+  console.log(data)
+  var i = 0
+  Object.keys(data).forEach(function (key){
+    if (data[key] === document.getElementById("ClassDataMap").textContent)
+    {
+      i = Number(key) + 1
+      i = i % Number(Object.keys(data).length)
+    }
+
+  })
+
+  console.log(i)
+  document.getElementById("ClassDataMap").textContent = data[i]
+  }
+
+
+function ChangeType()
+{
+  var temp = {0:"Year",1:"Doctrine",2:"Task"}
+  let i = 0
+  Object.keys(temp).forEach(function (key){
+    if (temp[key] === document.getElementById("TypeDataMap").textContent)
+    {
+      i = Number(key) + 1
+      i = i % Number(Object.keys(temp).length)
+    }
+
+  })
+  document.getElementById("TypeDataMap").textContent = temp[i]
+  document.getElementById("ClassDataMap").textContent = "All"
+
+}
 
