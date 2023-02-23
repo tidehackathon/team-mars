@@ -552,3 +552,179 @@ group by
 	1, 2, 3
 
 Wyznacza ilość i rodzaj błędów testów dla capabilities danych nacji z podziałem na taski tych capabilities
+
+Final KPI
+
+select
+	s1.cap_name as capability_name,
+	s1.dom_name as capability_domain_name,
+	s1.participant_result as capability_test_result,
+	s2.dom_name as objective_domain_name,
+	s2.exercise_cycle as exercise_cycle,
+	s2.overall_result as test_result,
+	count(s1.cap_name) as tested_n_times,
+	s1.dom_name && s2.dom_name as tests_declared_domains
+from
+	(select 
+		s1.cap_name,
+		s1.dom_name,
+		tp.testcase_id,
+		tp.participant_result 
+	from 
+		test_participants tp 
+	join
+		(select 
+			c.id,
+			c."name" as cap_name,
+			s1.names as dom_name
+		from 
+			capabilities c 
+		join
+			(select 
+				cod.capability_id,
+				array_agg(od."name") as names 
+			from 
+				operational_domains od 
+			join
+				capability_operational_domains cod 
+			on
+				od.id =cod.operational_domain_id
+			where
+				od."name" != 'Other Support Services'
+			group by
+				1) s1
+		on
+			c.id = s1.capability_id) s1
+	on 
+		tp.capability_id = s1.id
+	where 
+		tp.participant_result != 'Pending' and tp.participant_result != 'Not Tested') s1
+join
+	(select 
+		s1.dom_name,
+		s1.exercise_cycle,
+		t.id,
+		t.overall_result 
+	from 
+		testcases t 
+	join
+		(select 
+			s1.exercise_cycle,
+			to2.testcase_id,
+			array_agg(distinct s1.dom_name) as dom_name
+		from 
+			test_objectives to2 
+		join
+			(select 
+				(case when fa."name" = 'Cyber Defence' then 'Cyberspace' else fa."name" end) as dom_name,
+				o.id,
+				o."name" as obj_name,
+				o.exercise_cycle
+			from 
+				focus_areas fa 
+			join
+				objectives o 
+			on
+				fa.id = o.focus_area_id 
+			where 
+				fa.is_operational_domain = 1) s1
+		on 
+			to2.objective_id = s1.id
+		group by
+			1, 2) s1 
+	on
+		t.id = s1.testcase_id
+	where 
+		t.overall_result != 'Pending' and t.overall_result != 'Not Tested') s2
+on 
+	s1.testcase_id = s2.id
+group by 
+	1, 2, 3, 4, 5, 6
+	
+select
+	s2.exercise_cycle as exercise_cycle,
+	(s1.dom_name && s2.dom_name) as tests_declared_domains,
+	case
+		when s1.participant_result = 'Success' and s2.overall_result = 'Success' then 'Full Success'
+		when s1.participant_result = 'Interoperability Issue' and s2.overall_result = 'Interoperability Issue' then 'Full Failure'
+		else 'Partial Success'
+	end as Merged_Result,
+	count(s1.cap_name) as tested_n_times
+from
+	(select 
+		s1.cap_name,
+		s1.dom_name,
+		tp.testcase_id,
+		tp.participant_result 
+	from 
+		test_participants tp 
+	join
+		(select 
+			c.id,
+			c."name" as cap_name,
+			s1.names as dom_name
+		from 
+			capabilities c 
+		join
+			(select 
+				cod.capability_id,
+				array_agg(od."name") as names 
+			from 
+				operational_domains od 
+			join
+				capability_operational_domains cod 
+			on
+				od.id =cod.operational_domain_id
+			where
+				od."name" != 'Other Support Services'
+			group by
+				1) s1
+		on
+			c.id = s1.capability_id) s1
+	on 
+		tp.capability_id = s1.id
+	where 
+		tp.participant_result != 'Pending' and tp.participant_result != 'Not Tested') s1
+join
+	(select 
+		s1.dom_name,
+		s1.exercise_cycle,
+		t.id,
+		t.overall_result 
+	from 
+		testcases t 
+	join
+		(select 
+			s1.exercise_cycle,
+			to2.testcase_id,
+			array_agg(distinct s1.dom_name) as dom_name
+		from 
+			test_objectives to2 
+		join
+			(select 
+				(case when fa."name" = 'Cyber Defence' then 'Cyberspace' else fa."name" end) as dom_name,
+				o.id,
+				o."name" as obj_name,
+				o.exercise_cycle
+			from 
+				focus_areas fa 
+			join
+				objectives o 
+			on
+				fa.id = o.focus_area_id 
+			where 
+				fa.is_operational_domain = 1) s1
+		on 
+			to2.objective_id = s1.id
+		group by
+			1, 2) s1 
+	on
+		t.id = s1.testcase_id
+	where 
+		t.overall_result != 'Pending' and t.overall_result != 'Not Tested') s2
+on 
+	s1.testcase_id = s2.id
+group by 
+	1, 2, 3
+order by
+	right(exercise_cycle, 4)::numeric asc, tests_declared_domains, Merged_Result asc
