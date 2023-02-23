@@ -14,46 +14,65 @@
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     </head>
     <body>
-    <div id ="page">
+    <div id ="page" class = "not-selectable">
         <div id = leftNav>
-            <li> Site one</li>
-            <li> Site second </li>
-            <li> Site third </li>
-        </div>
+                <div id = headerNav>
+                    <div>Dashboard</div>
+                </div>
+
+                <li>
+                    <u> World Map</u>
+                    <div>
+                        <div class = "openSite">
+                            <div class = navArrow>&#8729;</div>
+                                <a>Doctrines | Tasks | Years</a>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <u> Timeline </u>
+                    <div>
+                        <div class = navArrow></div>
+                        <a>Chart | Plots </a>
+                    </div>
+                </li>
+                <li>
+                    <u> Last types of Kpi?</u>
+                    <div>
+                        <div class = navArrow></div>
+                        <a>Third</a>
+                    </div>
+                </li>
+
+
+            </div>
 
         <div id ="rightSite">
             <div id = "wordbarContainer">
+
                 <div id="wordbar">
-                    <div>Map overview</div>
-                    <div><-Year-></div>
+                    <div class ="mapbarContainer left">
+                        <div><b>Map overview</b></div>
+                    </div>
+
+                    <div class ="mapbarContainer right">
+                        <div class = "buttonMapContainer Type">
+                            <button class="mapButton First" onclick = ChangeType()> < </button>
+                                <b id ="TypeDataMap" class = "LabelData">Year</b>
+                            <button class ="mapButton First" onclick = ChangeType()> > </button>
+                        </div>
+                        <div class = "buttonMapContainer Type">
+                            <button class="mapButton First" onclick = ChangeClass()> < </button>
+                                <b id ="ClassDataMap" class = "LabelData">Year</b>
+                            <button class ="mapButton First" onclick = ChangeClass()> > </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-
             <div id="main" class="main">
                 <div id = "CountryContainer">
                 <div class = frame>
                     <div id = headerMap>
-{#                        <div class="container">#}
-{#                            <div class="dropdown">#}
-{#                                  <button class="dropbtn">--Year--</button>#}
-{#                                  <div class="dropdown-content">#}
-{#                                    <li id = "AllYear">All</li>#}
-{#                                    <li id = "2022">Year 2022</li>#}
-{#                                    <li id = "2021">Year 2021</li>#}
-{#                                  </div>#}
-{#                            </div>#}
-{##}
-{#                            <div class="dropdownDoctrine">#}
-{#                                  <button class="dropbtnDoctrine">--Doctrine--</button>#}
-{#                                  <div class="dropdown-contentDoctrine">#}
-{#                                    <li id ="All">All</li>#}
-{#                                    <li id ="Sea">Sea</li>#}
-{#                                    <li id="Land">Land</li>#}
-{#                                      <li id = "Space">Space</li>#}
-{##}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </div>#}
                     </div>
 
                     <div id = "worldContainer">
