@@ -1,0 +1,177 @@
+body {
+    margin: 0;
+    font-family: "Lucida Console", "Courier New", monospace;
+}
+
+.not-selectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+
+#leftNav {
+    background-color: #1e2d43;
+    width: 200px;
+    height: 100%;
+    position: fixed;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5%;
+    color: lightgray;
+    }
+#headerNav {
+    margin: 20px;
+    justify-content: center;
+    font-size: 20px;
+}
+
+
+#leftNav li {
+    background-color: #1e2d4a;
+    height: 33%;
+    display: flex;
+    flex-direction: column;
+    padding: 5%;
+    cursor: pointer;
+}
+
+#leftNav li:hover {
+    filter: brightness(75%);
+}
+#leftNav u {
+    color: grey;
+    text-decoration: none;
+}
+
+#leftNav div {
+    display: flex;
+    justify-content: space-between;
+    height: 40px;
+}
+#leftNav div a {
+    padding: 10px;
+    text-align: right;
+}
+.openSite {
+    color: white;
+}
+
+.navArrow {
+    font-size: 2rem;
+}
+
+
+#rightSite {
+    margin-left: 200px;
+ }
+
+/*top bar of world map*/
+
+#wordbarContainer {
+    height: 40px;
+    background-color:rgba(0,0,0,0.1);
+}
+#wordbar {
+    display: flex;
+    justify-content: space-between;
+    height: 95%;
+    width: 100%;
+    background-color: white;
+}
+.mapbarContainer {
+    display: flex;
+    justify-content: space-around;
+    height: 100%;
+
+
+    color: darkgray;
+}
+.left {
+    width: 25%;
+    margin-left: 5%;
+    font-size: 20px;
+}
+.right {
+    width: 45%;
+}
+.mapbarContainer div {
+    padding: 10px;
+    font-size: 18px;
+}
+/*Konfiguracja switchy mapy*/
+.mapButton {
+    color: darkgray;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+}
+.Type
+{
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+}
+
+.LabelData
+{
+    min-width: 100px;
+    text-align: center;
+}
+
+
+
+
+.worldContainer {
+    margin: 20px;
+    height: 300px;
+    width: 300px;
+    background-color: white;
+}
+.main {
+    display: flex;
+}
+#DataContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 2px 15px;
+    width: 100%;
+    background-color: rgba(0,0,0,0.1);
+
+    overflow-y: scroll;
+    top: 0;
+    bottom: 0;
+}
+.Data {
+    display: block;
+    background-color: white;
+    width: 99%;
+    margin-left: 2px;
+}
+/* wypelnienie wartosci*/
+
+#SimpleSummary {
+    height: 10%;
+}
+#chartOne {
+    height: 45%;
+}
+#chartTwo {
+    height: 45%;
+}
+#DataCountry {
+    text-align: center;
+    height: 5%;
+}
+.frame {
+    background-color: white;
+    height: 100%;
+}
+.container {
+    display: flex;
+
+}
