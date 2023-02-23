@@ -1,0 +1,98 @@
+1. Homepage - z danymi zewnętzrnymi na więcej lat. 14 lat danych. Proste wykresy kolumnowe z możliwość wyliczenia przyszłych trendów, trzeba zaznaczyć że w 2020 był covid i jest spadek uczestników. Z danymi:
+    Capabilities - zgłaszane do tesotwanie.
+    Test Cases - testy przygotowane do capabilites.
+    Participants - Uczestnicy danego Capablity.
+    Participating Nations - Uczęstniczące kraje.
+    Oberving Nations - Państwa obesrwujące.
+
+
+2. Ilość wystawionych capablilites, przez daną nację, pokazuje to że im większa ilość testów tym większa interoperacyjnośc. Tabele użyte:
+    - Nations,
+    - Capabilites,
+    - Test praticipants
+
+    Wykres liniowy na daną nację, pokazuje trend wystawiawanych capablilites. Naszym celem wyzacznenie ilość wystawianych capblilites w stosunku do wilekośći państwa. (Budżet na MON)
+
+3.  Ilość sukcesów dla danego capablility w prównaniu z porażakmi. Im więcej sukcesów tym lepiej, naszym celem jest uzystkanie wartości 1.
+
+To samo co 11 - 4. Ilość domen których dotyczy dany capablility. Pokazuje współprace miedzy danmi domentami nato. Im więcej tym teoretycznie lepiej. (minimum to 1 aby zaliczyć do dobrej wartości.)
+
+
+DO ZMIANY BO NIE DZIAŁA - 5. Ile capabilites ucztyczyło w jednym tescase, daje nam to wgląd jak dużo Capablities może ze sobą wspóracować możliwe bez testów bezpośrednich między sobą.
+                            Bo wiele testów ma wiele capbalilites i na odwrót więc jeśli jeden test ma np. 5 zaliczonych capablilites, to nawet jeśli nie były testowane w jednym setcie testów to teoretycznie powinny
+                            współprawcować ze sobą;
+
+6. Korelacja między ilości domen capblilite a ilością zaliczonych test casów. Jeśli więcej mamy capability mające taką samą ilość domen do wartości znadych testó poprawiana jest interoperacyjnosć;
+    Sprawdzmy czy zwiększając ilość domen do danego capablility nie zmienia się nam ilość zadanych testów, Jeśli się ona zminejsza to interpoeracyjność spada lub się nie zmienia więc dodawanie nowych
+    domen jest bez sensu.
+
+7. Sprawdzenie ilości wszyskich możliwych wariantów domen, zakładamy że wzrost najżadszych wairantów jest pozytywna bez względu na wyniki testcaseów, przy dożej ilości danych warinatów powinna wzrastać ilość pozytywnych
+    wyników. Wizualizacja grafem 6 kól połączonych liniami, grubość lini oznacza ilość capabilites.
+
+8. Korelacja między ilością domen a wykryciem błędów w standradach. Czy duża lość domen wpływa na wzorst ilości błędów ozancza to że standarady nie są przystossowane do działania w wielu domeach, im mniej tym lepiej.
+    *WYDAJE NAM SIĘ ŻE TU JEST BŁĄD ZAMIAST STANDRADACH POWINNO BYĆ TESTACH*
+
+
+9. Połączenie ilości udanych/niudanych testów na daną focus area. Pokazuje to nam na wykresie czasu czy dany focus area sprawia dużo problemów przy interpoercyjności, i tenrd w czasie.
+
+10. Jaki procent błędów w standradach został wykryty przez testy które miały te błędy wykryć i jaką część wszystkich capablilites stanowią te które miały wykryć błedy. Jeśli przy nie wielkim procencie cabilities wykrywających
+    błedy w standradach wykryły one znaczacą część spełniają one swoje zadanie.
+
+11. Wyliczamy dla każdego państwa ilość capablilites dla każdej z domen, następnie wyznaczamy średnią wartość capablilities na 6 i liczymy różnicę między wartością średnią a wartością rzeczywistą. Dla państw działających w
+    wszystkich domenach w miarę równo. Dajemy wartość wszystkich błędów do kwadratu żeby usnąć wartości ujemne, sumujemy i robimiy pierwiastek sumy, im wartośc uzyskana jest bliższa zera tym bardziej wyspecjalizowane jest
+    państwo w danej domenie.
+
+12. Połączenie ilość warfare_levels względem danego capability, czy zwiększenie ilośc warfare_levels ma wpływ na procent błędów w testach. Jeśli wraz ze wzrostem zwiększamy ilość jakiejkowliek wartośc oprócz ilość błędów
+    to interpoercyjności zwiększa się.
+
+13. Wyliczamy wartość udanych wyników uczestników danego testu, w stostunku do wsyzstkich wyników danego testu. Jeśli wynik ten jest równy lub bardzo bliski ogólnej wartości wszystkich testów to interpoeracyjność jest dobra.
+
+14. Wyliczamy stosunek dla każdego standardu sumę testów zaliczonych i nie zaliczonych. Dla standardu o dużej oblewalności można wnioskować że problem interpoeracyjności może nie leżeć w samym capablility a w standardzie na
+    na którym został oparty dany test.
+
+15. Dana nacja wystawia jakieś capability które ma spełniać dane taski. Możliwym jest że capabilites wystawione przez daną nację w danych taskach często nie przechodzi testów z określonego powodu, kóry się powtarza.
+    Pokazuje to że istnieją problemy w danej nacji z pewną sferą capabilites z danego rodzaju tasków. Zmniejszczenie ilości tych błędów powoduje zwiększnie interpoeracyjność w danej strefie zadań.
+
+
+
+
+
+ŁĄCZENIE KPI DLA WARTOŚCI ABSTRAKCYJNYCH:
+
+ - Połaczenie 8 i 9, wynik określa nam zależności interpoeracyjności między domeną a focus area. (d/t)/(f/t) = d/f (gdzie d - Domena, t - Testy, f - focus area)
+
+ - Połączenie capabilities domain task i issue, określa czy dane połączenie domain, capabilites, tasks i tasks powoduje problemy jeśli liczba zbliża się do określonej liczby wynika z tego że dane połączenie sprawia jakieś
+    problemy, przez to interpoeracyjność nie jest wysoka. (STRONA Z WZORAMI DÓŁ 1 pierwsza)
+
+ - Sprawdzenie korelacji statusu rozwoju danego capability podczas testowania wzglęm względem prcenta pozytywnych wyników testów.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NOATAKA DLA EDYTORA:
+
+    Brak możliwości sprawdzenia poprawy jakości interoperacyjnosć danych capablilites, poprzez porównanie wyników testów na różnych warsztatach i fazach rozwoju danego capability.
+
+    Dane historyczne dla danego rozwiązania, czy zostało sprawdzane wilokortnie, i czy pojawiła się jakakolwiek poprawa w interoperacyjnosć
+
+
+

@@ -1,0 +1,801 @@
+This file is a compilation of used and unused interoperability KPI's
+
+KPI 1
+
+select
+	name Country_name,
+	substring(name from 8) as temp_ind,
+	count(participant_result) as Sum_Of_All_Participations,
+	count(case when participant_result = 'Success' then 1 end) as Success,
+	count(case when participant_result = 'Limited Success' then 1 end)as Limited_success,
+	count(case when participant_result = 'Pending' then 1 end) as Pending,
+	count(case when participant_result = 'Not Tested' then 1 end) as Not_Tested,
+	count(case when participant_result = 'Interoperability Issue' then 1 end) as Interoperability_Issue 
+		from 
+			(select coalesce(c.id, 0) as id, n.name from capabilities c right join nations n on c.nation_id = n.id ) s1 
+		left join 
+			test_participants tp on s1.id = tp.capability_id 
+		where 
+			exercise_cycle = 'CWIX 2021'
+		group by name
+		order by cast(substring(name from 7)as int) asc
+
+
+KPI 2
+
+select
+	name Country_name,
+	exercise_cycle,
+	count(participant_result) as Sum_Of_All_Participations
+		from 
+			(select c.id, n.name from capabilities c right join nations n on c.nation_id = n.id ) s1 
+		left join 
+			test_participants tp on s1.id = tp.capability_id 
+		group by name, exercise_cycle
+		order by cast(substring(name from 7)as int) asc, right(exercise_cycle, 2) asc
+
+KPI 3
+
+select
+	exercise_cycle,
+	round(((sum(Success_To_All_Ratio) / count(name))::numeric) *100, 5) as Average_success_rate
+		from 
+			(select 
+				c."name",
+				exercise_cycle,
+				cast(count(case when participant_result = 'Success' or participant_result = 'Limited Success' then 1 end) as float)/cast(count(participant_result) as float) as Success_To_All_Ratio
+					from 
+						capabilities c 
+					join 
+						(select capability_id, participant_result, exercise_cycle from test_participants tp where participant_result = 'Success' or participant_result = 'Limited Success' or participant_result = 'Interoperability Issue') as s1 
+					on 
+						c.id = s1.capability_id
+					group by c."name", exercise_cycle) as s1
+	group by exercise_cycle
+	order by right(exercise_cycle, 4) asc
+
+KPI 6
+
+select
+	exercise_cycle,
+	dom_count,
+	sum(success_to_all_ratio) / count(s1.capability_id) as Averafe_succes_rate_in_domain
+		from
+		(select 
+			capability_id,
+			count(operational_domain_id) as dom_count
+				from 
+					capability_operational_domains cod 
+				group by
+					capability_id ) s1
+		join 
+		(select 
+			exercise_cycle,
+			capability_id,
+			cast(count(case when participant_result = 'Success' or participant_result = 'Limited Success' then 1 end) as float)/cast(count(participant_result) as float) as Success_To_All_Ratio
+				from 
+					capabilities c 
+				join 
+					(select capability_id, participant_result, exercise_cycle from test_participants tp where participant_result = 'Success' or participant_result = 'Limited Success' or participant_result = 'Interoperability Issue') as s1 
+				on 
+					c.id = s1.capability_id
+				group by exercise_cycle, capability_id) s2
+		on
+			s1.capability_id = s2.capability_id
+	group by exercise_cycle, dom_count 
+	order by right(exercise_cycle , 4) asc, dom_count asc
+
+KPI 7
+
+select 
+	s3.exercise_cycle,
+	s3.perm,
+	coalesce(s2.con, 0) as number_of_happenings
+from 
+	(select 	
+		s2.perm,
+		tp.exercise_cycle,
+		count(s2.capability_id) as con
+	from
+		test_participants tp 
+		join
+			(select 
+				cod.capability_id, 
+				string_agg(cod.operational_domain_id::varchar(100), '') as perm
+				from
+					capability_operational_domains cod 
+				group by capability_id
+				order by capability_id  asc) as s2
+		on
+			tp.capability_id = s2.capability_id
+	group by
+		s2.perm, tp.exercise_cycle 
+	order by
+		 perm asc, right(exercise_cycle, 4) asc) s2
+right join
+	(select
+		*
+	from 
+		(select
+			t.exercise_cycle 
+		from 
+			testcases t 
+		group by
+			1
+		order by 
+			1) s1
+	join
+		(select
+			s1.perm
+		from
+			(select 
+				cod.capability_id as cid, 
+				string_agg(cod.operational_domain_id::varchar(100), '') as perm
+			from
+				capability_operational_domains cod 
+			group by capability_id
+			order by capability_id  asc) s1
+		group by 1
+		order by s1.perm::numeric) s2
+	on
+		true) s3
+on
+	s2.exercise_cycle = s3.exercise_cycle and s2.perm = s3.perm
+
+KPI 8
+
+select
+	exercise_cycle,
+	io_shortfall_ind,
+	sum(s2.cou) / count(s2.cou) as Average_domain_complexity
+from
+	(select 
+		t.exercise_cycle,
+		t.id,
+		capability_id,
+		t.io_shortfall_ind 
+	from 
+		testcases t 
+	join
+		test_participants tp 
+	on
+		t.id = tp.testcase_id 
+	order by t.id asc) s1
+join
+	(select 
+		capability_id,
+		count(operational_domain_id) as cou
+	from capability_operational_domains cod 
+	group by capability_id 
+	order by 1 asc) s2
+on
+	s1.capability_id = s2.capability_id
+group by exercise_cycle, io_shortfall_ind
+order by right(exercise_cycle, 4)
+
+KPI 9
+
+select
+	exercise_cycle, fa."name", success, limited_success, pending, not_tested, interoperability_issue
+from
+	focus_areas fa 
+join
+	(select
+		s1.exercise_cycle,
+		focus_area_id,
+		count(case when s1.overall_result = 'Success' then 1 end) as Success,
+		count(case when s1.overall_result = 'Limited Success' then 1 end) as Limited_success,
+		count(case when s1.overall_result = 'Pending' then 1 end) as Pending,
+		count(case when s1.overall_result = 'Not Tested' then 1 end) as Not_Tested,
+		count(case when s1.overall_result = 'Interoperability Issue' then 1 end) as Interoperability_Issue
+	from
+		objectives o 
+	join
+		(select
+			t.exercise_cycle,
+			t.id,
+			to2.objective_id,
+			t.overall_result 
+		from 
+			testcases t 
+		join
+			test_objectives to2 
+		on
+			t.id = to2.testcase_id ) s1
+	on 
+		o.id = s1.objective_id
+	group by 
+		s1.exercise_cycle, focus_area_id
+	order by 
+		focus_area_id  asc) s1
+on
+	fa.id = s1.focus_area_id
+order by 
+	right(exercise_cycle, 4), 2
+
+KPI 10
+
+select
+	t.exercise_cycle, 
+	was_validating,
+	t.io_shortfall_ind standard_shortdall,
+	count(t.id)
+from 
+	testcases t 
+join
+	(select 
+		testcase_id,
+		sum(case when task_id = 9 then 1 else 0 end) > 0 was_validating
+	from
+		capability_tasks ct 
+	join
+		test_participants tp 
+	on
+		ct.capability_id = tp.capability_id
+	group by testcase_id) s1
+on s1.testcase_id = t.id
+group by t.exercise_cycle, was_validating, t.io_shortfall_ind
+order by 1, 2, 3
+
+KPI 11
+
+select
+	ec,
+	country_name,
+	(sqrt(power(Air_avg_diff, 2) + power(Land_avg_diff, 2) + power(Maritime_avg_diff, 2) + power(Cyberspace_avg_diff, 2) + power(Space_avg_diff, 2) + power(Other_Support_Services_avg_diff, 2)))/straight_average as Specialization_indicator,
+	Air_avg_diff,
+	Land_avg_diff,
+	Maritime_avg_diff,
+	Cyberspace_avg_diff,
+	Space_avg_diff,
+	Other_Support_Services_avg_diff
+from
+	(select	
+		s1.name Country_name,
+		exercise_cycle ec,
+		count(s1.id)::float/6 as Straight_average,
+		count(case when s2.name = 'Air' then 1 end) - count(s1.id)::float/6 as Air_avg_diff,
+		count(case when s2.name = 'Land' then 1 end) - count(s1.id)::float/6 as Land_avg_diff,
+		count(case when s2.name = 'Maritime' then 1 end) - count(s1.id)::float/6 as Maritime_avg_diff,
+		count(case when s2.name = 'Cyberspace' then 1 end) - count(s1.id)::float/6 as Cyberspace_avg_diff,
+		count(case when s2.name = 'Space' then 1 end) - count(s1.id)::float/6 as Space_avg_diff,
+		count(case when s2.name = 'Other Support Services' then 1 end) - count(s1.id)::float/6 as Other_Support_Services_avg_diff
+	from 
+		(select
+			tp2.exercise_cycle,
+			s1.name,
+			s1.id
+		from
+			(select 
+				n."name",
+				c.id 
+			from
+				capabilities c 
+			join
+				nations n 
+			on
+				c.nation_id = n.id) s1
+		join
+			(select 
+				distinct exercise_cycle, tp.capability_id 
+			from 
+				test_participants tp) tp2  
+		on
+			s1.id = tp2.capability_id) s1
+	join 
+		(select
+			cod.capability_id, 
+			od."name"
+		from 
+			operational_domains od 
+		join
+			capability_operational_domains cod 
+		on
+			od.id = cod.operational_domain_id) s2
+	on
+		s1.id = s2.capability_id
+	group by
+		s1.name, exercise_cycle
+	order by
+		substring(s1.name, 7)::int, right(exercise_cycle, 4)) s1
+
+KPI 12
+
+select 
+	exercise_cycle,
+	s1.number_of_warfare_levels,
+	count(case when participant_result = 'Interoperability Issue' then 1 end)::float / count(tp.capability_id) as Issue_to_all_test_ratio
+from 
+	(select 
+		cw.capability_id,
+		count(wl.name) number_of_warfare_levels
+	from
+		warfare_levels wl 
+	join
+		capability_warfarelevels cw 
+	on
+		cw.warfarelevel_id = wl.id
+	group by 
+		cw.capability_id) s1
+join 
+	test_participants tp 
+on
+	s1.capability_id = tp.capability_id
+where 
+	tp.participant_result != 'Pending' and tp.participant_result != 'Not Tested'
+group by 
+	exercise_cycle, s1.number_of_warfare_levels
+order by 
+	right(exercise_cycle, 4), 2
+
+KPI 13
+
+select
+	s1.exercise_cycle,
+	sum(s1.failure_rate) / count(s1.failure_rate) as Average_failure_rate_of_participant_in_test
+from
+	(select
+		s1.exercise_cycle,
+		t.title, 
+		s1.testcase_id,
+		s1.Success,
+		s1.Interoperability_issue,
+		s1.Sum_all,
+		interoperability_issue::float / s1.sum_all as failure_rate
+	from
+		(select
+			tp.exercise_cycle,
+			tp.testcase_id,
+			count(case when tp.participant_result = 'Success' or tp.participant_result = 'Limited Success' then 1 end) as Success,
+			count(case when tp.participant_result = 'Interoperability Issue' then 1 end) as Interoperability_issue,
+			count(tp.participant_result) as Sum_all
+		from 
+			test_participants tp
+		where 
+			tp.participant_result != 'Not Tested' and tp.participant_result != 'Pending'
+		group by
+			tp.exercise_cycle, tp.testcase_id
+		order by
+			right(exercise_cycle, 4), 2) s1
+	join 
+		testcases t 
+	on
+		s1.testcase_id = t.id) s1
+group by
+	s1.exercise_cycle
+
+KPI 14
+
+select
+	s1.name,
+	s1.success,
+	s1.interoperability_issue,
+	s1.interoperability_issue::float / s1.sum_of_all as issue_ratio
+from
+	(select 
+		s1.name,
+		count(case when overall_result = 'Success' or overall_result = 'Limited Success' then 1 end) as Success,
+		count(case when overall_result = 'Interoperability Issue' then 1 end) as Interoperability_issue,
+		count(overall_result) as sum_of_all
+	from 
+		testcases t 
+	join
+		(select 
+			ts.testcase_id,
+			s."name" 
+		from 
+			standards s 
+		join
+			testcase_standards ts 
+		on
+			s.id = ts.standard_id ) s1
+	on
+		t.id = s1.testcase_id
+	where 
+		overall_result != 'Not Tested' and overall_result != 'Pending' and exercise_cycle = 'CWIX 2022'
+	group by 
+		s1.name
+	order by 
+		s1.name) s1
+
+KPI 15
+
+select 
+	s2.ec,
+	s2.n,
+	(sum(s2.Average_standarized_diff)/count(s2.nn)) as cwix_average
+from
+	(select
+		s1.nn,
+		s1.n,
+		s1.ec,
+		(((sqrt((power(Test_planning - avg_all, 2) + power(Lack_of_time - avg_all, 2) + power(FMN - avg_all, 2) + power(Not_executable - avg_all, 2) + power(Architecture - avg_all, 2) + power(Withdrawn_CC - avg_all, 2) + power(Config - avg_all, 2) + power(Training - avg_all, 2) + power(Standards - avg_all, 2) + power(Permisiions - avg_all, 2) + power(Software - avg_all, 2) + power(Duplicated_TC - avg_all, 2))/11))/avg_all)*100)as Average_standarized_diff
+	from
+		(select 
+			s3.nation_name as nn,
+			s3.name as n,
+			s4.exercise_cycle as ec,
+			count(case when s4.name = 'Test Planning' then 1 end) as Test_planning,
+			count(case when s4.name = 'Lack of time' then 1 end) as Lack_of_time,
+			count(case when s4.name = 'FMN - irrelevant imported IOCore-TC' then 1 end) as FMN,
+			count(case when s4.name = 'Not Executable' then 1 end) as Not_executable,
+			count(case when s4.name = 'Architecture' then 1 end) as Architecture,
+			count(case when s4.name = 'Withdrawn CC' then 1 end) as Withdrawn_CC,
+			count(case when s4.name = 'Configuration' then 1 end) as Config,
+			count(case when s4.name = 'Training' then 1 end) as Training,
+			count(case when s4.name = 'Standards' then 1 end) as Standards,
+			count(case when s4.name = 'Permissions' then 1 end) as Permisiions,
+			count(case when s4.name = 'Software' then 1 end) as Software,
+			count(case when s4.name = 'Duplicated TC' then 1 end) as Duplicated_TC,
+			count(s4.name)::float / 12 as avg_all
+		from
+			(select 
+				s1.nation_name,
+				s1.cap_name,
+				s2.name,
+				s1.id
+			from 
+				(select 
+					n."name" as nation_name,
+					c."name" as cap_name,
+					c.id
+				from 
+					nations n 
+				join
+					capabilities c 
+				on
+					n.id = c.nation_id) s1
+			join
+				(select 
+					t."name",
+					ct.capability_id 
+				from 
+					tasks t 
+				join
+					capability_tasks ct 
+				on
+					ct.task_id = t.id) s2	
+			on
+				s1.id = s2.capability_id) s3
+		join 
+			(select 
+				tp.capability_id,
+				s1.exercise_cycle,
+				s1.name
+			from 
+				test_participants tp 
+			join
+				(select 
+					t.id,
+					t.exercise_cycle,
+					s1.name
+				from 
+					testcases t 
+				join
+					(select 
+						ic."name",
+						tic.testcase_id 
+					from 
+						testcase_issue_categories tic 
+					join
+						issue_categories ic 
+					on
+						tic.issue_category_id = ic.id 
+					where
+						tic.issue_category_id != 12) s1
+				on
+					t.id = s1.testcase_id) s1
+			on
+				tp.testcase_id = s1.id) s4
+		on 
+			s3.id = s4.capability_id
+		group by 
+			1, 2, 3	) s1) s2
+group by 
+	1, 2
+
+KPI 16
+
+select 
+	n,
+	test_fail_propability_2022
+from 
+	(select 
+		s1.name as n,
+		(s1.cwix_2021_bad::float / nullif(s2.cwix_2021_all,0)) as test_fail_propability_2021,
+		(s1.cwix_2022_bad::float / nullif(s2.cwix_2022_all,0)) as test_fail_propability_2022
+	from
+		(select 
+			s1.name,
+			count(case when s1.exercise_cycle = 'CWIX 2021' then 1 end) as CWIX_2021_bad,
+			count(case when s1.exercise_cycle = 'CWIX 2022' then 1 end) as CWIX_2022_bad
+		from 
+			(select 
+				s2.id,
+				s1.name,
+				s2.exercise_cycle,
+				s2.overall_result
+			from 
+				(select 
+					s.name,
+					ts.testcase_id
+				from 
+					standards s 
+				join
+					testcase_standards ts 
+				on
+					s.id = ts.standard_id) s1
+			join 
+				(select 
+					t.id,
+					exercise_cycle,
+					t.overall_result 
+				from 
+					testcases t 
+				where 
+					overall_result != 'Success' and not io_shortfall_ind) s2
+			on
+				s1.testcase_id = s2.id) s1
+		join 
+			(select
+				tic.testcase_id,
+				ic.name	
+			from 
+				issue_categories ic 
+			join
+				testcase_issue_categories tic 
+			on
+				ic.id = tic.issue_category_id 
+			where 
+				ic.id != 9 and ic.id != 12) s2
+		on
+			s1.id = s2.testcase_id
+		group by 
+			1) s1
+	join	
+		(select 
+			s1.name,
+			count(case when s1.exercise_cycle = 'CWIX 2021' then 1 end) as CWIX_2021_all,
+			count(case when s1.exercise_cycle = 'CWIX 2022' then 1 end) as CWIX_2022_all
+		from 
+			(select 
+				s2.id,
+				s1.name,
+				s2.exercise_cycle,
+				s2.overall_result
+			from 
+				(select 
+					s.name,
+					ts.testcase_id
+				from 
+					standards s 
+				join
+					testcase_standards ts 
+				on
+					s.id = ts.standard_id) s1
+			join 
+				(select 
+					t.id,
+					exercise_cycle,
+					t.overall_result 
+				from 
+					testcases t 
+				where 
+					not io_shortfall_ind) s2
+			on
+				s1.testcase_id = s2.id) s1
+		join 
+			(select
+				tic.testcase_id,
+				ic.name
+			from 
+				issue_categories ic 
+			join
+				testcase_issue_categories tic 
+			on
+				ic.id = tic.issue_category_id ) s2
+		on
+			s1.id = s2.testcase_id
+		group by 
+			1) s2 
+	on
+		s1.name = s2.name) s1
+where
+	test_fail_propability_2022 = 1
+		
+select 
+	n,
+	test_fail_propability_2021
+from 
+	(select 
+		s1.name as n,
+		(s1.cwix_2021_bad::float / nullif(s2.cwix_2021_all,0)) as test_fail_propability_2021,
+		(s1.cwix_2022_bad::float / nullif(s2.cwix_2022_all,0)) as test_fail_propability_2022
+	from
+		(select 
+			s1.name,
+			count(case when s1.exercise_cycle = 'CWIX 2021' then 1 end) as CWIX_2021_bad,
+			count(case when s1.exercise_cycle = 'CWIX 2022' then 1 end) as CWIX_2022_bad
+		from 
+			(select 
+				s2.id,
+				s1.name,
+				s2.exercise_cycle,
+				s2.overall_result
+			from 
+				(select 
+					s.name,
+					ts.testcase_id
+				from 
+					standards s 
+				join
+					testcase_standards ts 
+				on
+					s.id = ts.standard_id) s1
+			join 
+				(select 
+					t.id,
+					exercise_cycle,
+					t.overall_result 
+				from 
+					testcases t 
+				where 
+					overall_result != 'Success' and not io_shortfall_ind) s2
+			on
+				s1.testcase_id = s2.id) s1
+		join 
+			(select
+				tic.testcase_id,
+				ic.name	
+			from 
+				issue_categories ic 
+			join
+				testcase_issue_categories tic 
+			on
+				ic.id = tic.issue_category_id 
+			where 
+				ic.id != 9 and ic.id != 12) s2
+		on
+			s1.id = s2.testcase_id
+		group by 
+			1) s1
+	join	
+		(select 
+			s1.name,
+			count(case when s1.exercise_cycle = 'CWIX 2021' then 1 end) as CWIX_2021_all,
+			count(case when s1.exercise_cycle = 'CWIX 2022' then 1 end) as CWIX_2022_all
+		from 
+			(select 
+				s2.id,
+				s1.name,
+				s2.exercise_cycle,
+				s2.overall_result
+			from 
+				(select 
+					s.name,
+					ts.testcase_id
+				from 
+					standards s 
+				join
+					testcase_standards ts 
+				on
+					s.id = ts.standard_id) s1
+			join 
+				(select 
+					t.id,
+					exercise_cycle,
+					t.overall_result 
+				from 
+					testcases t 
+				where 
+					not io_shortfall_ind) s2
+			on
+				s1.testcase_id = s2.id) s1
+		join 
+			(select
+				tic.testcase_id,
+				ic.name
+			from 
+				issue_categories ic 
+			join
+				testcase_issue_categories tic 
+			on
+				ic.id = tic.issue_category_id ) s2
+		on
+			s1.id = s2.testcase_id
+		group by 
+			1) s2 
+	on
+		s1.name = s2.name) s1
+where 
+	test_fail_propability_2021 = 1
+
+KPI 17
+
+select
+	s2.exercise_cycle as exercise_cycle,
+	(s1.dom_name && s2.dom_name) as tests_declared_domains,
+	case
+		when s1.participant_result = 'Success' and s2.overall_result = 'Success' then 'Full Success'
+		when s1.participant_result = 'Interoperability Issue' and s2.overall_result = 'Interoperability Issue' then 'Full Failure'
+		else 'Partial Success'
+	end as Merged_Result,
+	count(s1.cap_name) as tested_n_times
+from
+	(select 
+		s1.cap_name,
+		s1.dom_name,
+		tp.testcase_id,
+		tp.participant_result 
+	from 
+		test_participants tp 
+	join
+		(select 
+			c.id,
+			c."name" as cap_name,
+			s1.names as dom_name
+		from 
+			capabilities c 
+		join
+			(select 
+				cod.capability_id,
+				array_agg(od."name") as names 
+			from 
+				operational_domains od 
+			join
+				capability_operational_domains cod 
+			on
+				od.id =cod.operational_domain_id
+			where
+				od."name" != 'Other Support Services'
+			group by
+				1) s1
+		on
+			c.id = s1.capability_id) s1
+	on 
+		tp.capability_id = s1.id
+	where 
+		tp.participant_result != 'Pending' and tp.participant_result != 'Not Tested') s1
+join
+	(select 
+		s1.dom_name,
+		s1.exercise_cycle,
+		t.id,
+		t.overall_result 
+	from 
+		testcases t 
+	join
+		(select 
+			s1.exercise_cycle,
+			to2.testcase_id,
+			array_agg(distinct s1.dom_name) as dom_name
+		from 
+			test_objectives to2 
+		join
+			(select 
+				(case when fa."name" = 'Cyber Defence' then 'Cyberspace' else fa."name" end) as dom_name,
+				o.id,
+				o."name" as obj_name,
+				o.exercise_cycle
+			from 
+				focus_areas fa 
+			join
+				objectives o 
+			on
+				fa.id = o.focus_area_id 
+			where 
+				fa.is_operational_domain = 1) s1
+		on 
+			to2.objective_id = s1.id
+		group by
+			1, 2) s1 
+	on
+		t.id = s1.testcase_id
+	where 
+		t.overall_result != 'Pending' and t.overall_result != 'Not Tested') s2
+on 
+	s1.testcase_id = s2.id
+group by 
+	1, 2, 3
+order by
+	right(exercise_cycle, 4)::numeric asc, tests_declared_domains, Merged_Result asc
