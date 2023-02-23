@@ -81,21 +81,11 @@
 
     </head>
    <body>
-        <div id="cwixdj">
-          <div id="year">
-          </div>
-          <div id="info1">IO <b>not</b> indicated: </div>
-          <div id="info2"> OI indicated: </div>
-          <div id="info3">IO <b>not</b> indicated: </div>
+        <div id="chart2021">
 
         </div>
-        <div id="cwixdd">
-        <div id="yeard">
-          </div>
-          <div id="info22_1">IO <b>not</b> indicated: </div>
-          <div id="info22_2">IO indicated: </div>
-          <div id="info22_3">IO <b>not</b> indicated: </div>
 
+        <div id="chart2022">
         </div>
         
    </body>
@@ -105,7 +95,7 @@
     function listawynikow(nrwartosci, lista) {
         const temp = []
         lista.forEach(element => {
-            temp.push(element[nrwartosci])
+            temp.push(element[nrwartosci]*1000)
         });
         return temp
     }
@@ -145,17 +135,49 @@
     });
     return temp
 }
-//document.getElementById("cwixdj").innerHTML =  [glownaWynik2022[0][0], Math.round(glownaWynik2022[0][2]*10000)/10000, Math.round(glownaWynik2022[1][2]*10000)/10000]
-document.getElementById("year").innerHTML =  glownaWynik2021[0][0];
-document.getElementById("info1").innerHTML +=  Math.round(glownaWynik2021[0][2]*10000)/10000;
-document.getElementById("info2").innerHTML +=  Math.round(glownaWynik2021[1][2]*10000)/10000;
-document.getElementById("info3").innerHTML +=  Math.round(glownaWynik2021[2][2]*10000)/10000;
-document.getElementById("yeard").innerHTML =  glownaWynik2022[0][0];
-document.getElementById("info22_1").innerHTML +=  Math.round(glownaWynik2022[0][2]*10000)/10000;
-document.getElementById("info22_2").innerHTML +=  Math.round(glownaWynik2022[1][2]*10000)/10000;
-document.getElementById("info22_3").innerHTML +=  Math.round(glownaWynik2022[2][2]*10000)/10000;
+var options21 = {
+          series: listawynikow(2, glownaWynik2021),
+          chart: {
+          width: 300,
+          type: 'pie',
+        },
+        labels: ['Strategic', 'Operational', 'Tactical'],
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 100
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+        };
 
+        var chart2021 = new ApexCharts(document.querySelector("#chart2021"), options21);
+        chart2021.render();
+var options22 = {
+          series: listawynikow(2, glownaWynik2022),
+          chart: {
+          width: 300,
+          type: 'pie',
+        },
+        labels: ['Strategic', 'Operational', 'Tactical'],
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 100
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+        };
 
-      
+        var chart2022 = new ApexCharts(document.querySelector("#chart2022"), options22);
+        chart2022.render();
 </script>
 
