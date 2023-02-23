@@ -123,7 +123,7 @@
         };
 
         ?>
-        function ReturnTrueFals(arrayofletters) {
+                function ReturnTrueFals(arrayofletters) {
     temp = []
     arrayofletters.forEach(element => {
         if (element == "f") {
@@ -141,6 +141,15 @@ var options21 = {
           width: 300,
           type: 'pie',
         },
+        theme: {
+      mode: 'light', 
+      palette: 'palette7', 
+        },
+        dataLabels: {
+            style: {
+      fontSize: '8px',
+      colors: ['white']
+  }},
         labels: ['Strategic', 'Operational', 'Tactical'],
         responsive: [{
           breakpoint: 480,
@@ -163,6 +172,16 @@ var options22 = {
           width: 300,
           type: 'pie',
         },
+        theme: {
+      mode: 'light', 
+      palette: 'palette7', 
+        },
+        dataLabels: {
+            style: {
+      fontSize: '8px',
+      colors: ['white']
+  },
+        },
         labels: ['Strategic', 'Operational', 'Tactical'],
         responsive: [{
           breakpoint: 480,
@@ -180,4 +199,6 @@ var options22 = {
         var chart2022 = new ApexCharts(document.querySelector("#chart2022"), options22);
         chart2022.render();
 </script>
+
+
 
